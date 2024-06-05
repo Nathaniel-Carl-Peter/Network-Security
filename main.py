@@ -18,12 +18,20 @@ print generated password
 """
 
 import random
+import string
 import hashlib
 
-VALID_CHARACTERS = ('a b c d e f g h i j k l m n o p q r s t u v w x y z '
-                    'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z')
 
-SPECIAL_CHARACTERS = "! @ # $ % ^ & * ( ) _ - = + ` ~ , . / ' [ ] < > ? { } |"
+VALID_CHARACTERS = string.printable.strip()
+# VALID_CHARACTERS = ('a b c d e f g h i j k l m n o p q r s t u v w x y z '
+#                     'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z')
+
+# numbers = [char for char in VALID_CHARACTERS if char.isdigit()]
+# letters = [char for char in VALID_CHARACTERS if char.isalpha()]
+special_characters = [char for char in VALID_CHARACTERS if not char.isalnum() and not char.isspace()]
+
+
+# SPECIAL_CHARACTERS = "! @ # $ % ^ & * ( ) _ - = + ` ~ , . / ' [ ] < > ? { } |"
 
 REQUIREMENTS = "Password must have a lower case, upper case letter, 1 number and a special character"
 
@@ -73,7 +81,7 @@ def is_valid_password(password):
             count_upper += 1
         elif char.islower():
             count_lower += 1
-        elif char in SPECIAL_CHARACTERS:
+        elif char in special_characters:
             count_special += 1
         else:
             return False
