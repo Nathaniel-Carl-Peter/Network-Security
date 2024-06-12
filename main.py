@@ -16,22 +16,14 @@ print generated password
 
 
 """
-
+import json
 import random
-import string
 import hashlib
 
+VALID_CHARACTERS = ('a b c d e f g h i j k l m n o p q r s t u v w x y z '
+                    'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z')
 
-VALID_CHARACTERS = string.printable.strip()
-# VALID_CHARACTERS = ('a b c d e f g h i j k l m n o p q r s t u v w x y z '
-#                     'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z')
-
-# numbers = [char for char in VALID_CHARACTERS if char.isdigit()]
-# letters = [char for char in VALID_CHARACTERS if char.isalpha()]
-special_characters = [char for char in VALID_CHARACTERS if not char.isalnum() and not char.isspace()]
-
-
-# SPECIAL_CHARACTERS = "! @ # $ % ^ & * ( ) _ - = + ` ~ , . / ' [ ] < > ? { } |"
+SPECIAL_CHARACTERS = "! @ # $ % ^ & * ( ) _ - = + ` ~ , . / ' [ ] < > ? { } | : ;"
 
 REQUIREMENTS = "Password must have a lower case, upper case letter, 1 number and a special character"
 
@@ -43,6 +35,7 @@ MAXIMUM_LENGTH_OF_PASSWORD = 20
 def main():
     # valid_characters = VALID_CHARACTERS.split()
     # special_characters = SPECIAL_CHARACTERS.split()
+    username = input("input username: ")
     print(REQUIREMENTS)
     valid_password = input("< ")
     while not is_valid_password(valid_password):
@@ -63,7 +56,10 @@ def main():
         print('Invalid Password!\n', REQUIREMENTS)
         valid_password = input("Please enter a password: ")
     print(valid_password)
-    export_password(valid_password)
+
+    valid_password = hash_password(valid_password, salt_password())
+    print(valid_password)
+    export_password(username, valid_password)
 
 
 def is_valid_password(password):
@@ -81,9 +77,10 @@ def is_valid_password(password):
             count_upper += 1
         elif char.islower():
             count_lower += 1
-        elif char in special_characters:
+        elif char in SPECIAL_CHARACTERS:
             count_special += 1
         else:
+            print(char)
             return False
     # if any of the 'normal' counts are zero, return False
     if count_upper == 0 or count_lower == 0 or count_digit == 0 or count_special == 0:
@@ -92,16 +89,26 @@ def is_valid_password(password):
     # if we get here (without returning False), then the password must be valid
     return True
 
-def salt_password(password):
-    salt_number = random.uniform()
 
-    print()
+def salt_password():
+    salt = ''.join([chr(int(random.uniform(33, 126))) for _ in range(16)])
+    return salt
 
 
+def hash_password(password, salt):
+    salted_password = salt + password
+    hash_object = hashlib.sha256(salted_password.encode())
+    hashed_password = hash_object.hexdigest()
+    return hashed_password
 
-def export_password(password):
-    with open("password.txt", "w") as out_file:
-        print(password, file=out_file)
 
+def export_password(username, password):
+    # with open("password.txt", "w") as out_file:
+    #     print(password, file=out_file)
+    save_details = []
+    with open("password.json", "w", encoding="UTF-8") as out_file:
+        key_to_details = {"username": username, "password": password}
+        save_details.append(key_to_details)
+        json.dump(save_details, out_file)
 
 main()
