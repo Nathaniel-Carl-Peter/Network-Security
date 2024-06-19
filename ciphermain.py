@@ -20,6 +20,7 @@ print generated password
 from Crypto.Cipher import DES
 from Crypto.Util.Padding import pad, unpad
 from Crypto.Random import get_random_bytes
+import rsa
 import json
 import random
 import hashlib
@@ -34,24 +35,44 @@ MENU_OPTIONS = "Menu\n(G)enerate new user and password\n(C)heck user and passwor
 
 
 def main():
+    # plaintext = "HELLO EVERYONE"
+    # n = 18
+    # print("Plain Text is : " + plaintext)
+    # print("Shift pattern is : " + str(n))
+    # print("Cipher Text is : " + caeser_cipher(plaintext, n))
+    phrase = "Hello world"
+    print(f"this is the caeser cipher: {phrase}")
+    print(caeser_cipher(phrase, 2))
+    message = "hello world".encode('utf-8')
+    print(message)
+    print("DES ENCRYPTION")
+    print(DES_encypt(message),"\n")
+    (publickey, privatekey) = rsa.newkeys(1024)
+    print("RSA ENCRYPTION")
+    print(f"this is the public key: {publickey}")
+    print(f"this is the private key: {privatekey}")
+    cipher_message = rsa.encrypt(message, publickey)
+    print(f"This is the RSA encrypted message: {cipher_message}")
+    # decoded_message = rsa.decrypt(cipher_message, publickey)
+    print(f"This is the decrypted RSA message: {(rsa.decrypt(cipher_message, privatekey)).decode('utf-8')}")
     # import user records
-    records = import_details()
-    menu_choice = input(MENU_OPTIONS).lower()
-
-    while menu_choice != 'q':
-        if menu_choice == 'g':
-            add_user(records)
-        elif menu_choice == 'c':
-
-            validate_password(records)
-        # the following is only for when i break the code
-        # elif menu_choice == 'f':
-        #     salt = salt_password()
-        #     hashed_password = hash_password("abCD##33", salt)
-        #     fix_password("Lucas", hashed_password, salt)
-        menu_choice = input(MENU_OPTIONS).lower()
-
-    export_password(records)
+    # records = import_details()
+    # menu_choice = input(MENU_OPTIONS).lower()
+    #
+    # while menu_choice != 'q':
+    #     if menu_choice == 'g':
+    #         add_user(records)
+    #     elif menu_choice == 'c':
+    #
+    #         validate_password(records)
+    #     # the following is only for when i break the code
+    #     # elif menu_choice == 'f':
+    #     #     salt = salt_password()
+    #     #     hashed_password = hash_password("abCD##33", salt)
+    #     #     fix_password("Lucas", hashed_password, salt)
+    #     menu_choice = input(MENU_OPTIONS).lower()
+    #
+    # export_password(records)
 
 
 def add_user(records):
@@ -64,7 +85,10 @@ def add_user(records):
         valid_password = input("Please enter a password: ")
     salt = salt_password()
     valid_password = hash_password(valid_password, salt)
+    print(caeser_cipher(valid_password, 2))
+    print(DES_encypt(valid_password))
     new_user = {"username": username, "password": valid_password, "salt": salt}
+    print(new_user)
     records.append(new_user)
 
 
@@ -115,6 +139,7 @@ def export_password(records):
     save_details = []
     with open("password.json", "w", encoding="UTF-8") as out_file:
         for record in records:
+            print(record)
             key_to_details = {"username": record['username'], "password": record['password'], "salt": record['salt']}
             save_details.append(key_to_details)
         json.dump(save_details, out_file)
@@ -137,8 +162,11 @@ def validate_password(records):
 
 def import_details():
     """Load in records from a json file."""
-    with open("password.json", "r", encoding="UTF-8") as in_file:
-        records = json.load(in_file)
+    try:
+        with open("password.json", "r", encoding="UTF-8") as in_file:
+            records = json.load(in_file)
+    except json.decoder.JSONDecodeError:
+        records = []
     return records
 
 
@@ -152,15 +180,6 @@ def fix_password(username, password, salt):
 
 
 def caeser_cipher(phrase, offset):
-
-    # for i in range(len(phrase)):
-    #     letter = phrase[i]
-    #
-    #     encrypted_phrase = "".join(chr((ord(letter) + offset) % 26))
-    #
-    # print(encrypted_phrase)
-    #
-
     ans = ""
     # iterate over the given text
     for i in range(len(phrase)):
@@ -180,20 +199,16 @@ def caeser_cipher(phrase, offset):
     return ans
 
 
+def DES_encypt(phrase):
+    # key = 'b'
+    key = get_random_bytes(8)
+
+    cipher = DES.new(key, DES.MODE_OFB)
+
+    # bit_phrase = phrase.encode('utf-8')
+    padded_phrase = pad(phrase, DES.block_size)
+    # encrypted_phrase = cipher.encrypt(padded_phrase)\
+    return cipher.iv + cipher.encrypt(padded_phrase)
 
 
-
-    # # key = 'b'
-    # key = get_random_bytes(8)
-    #
-    # cipher = DES.new(key, DES.MODE_ECB)
-    #
-    # phrase = b'Hello world'
-    # padded_phrase = pad(phrase, DES.block_size)
-    # encrypted_phrase = cipher.encrypt(padded_phrase)
-    # # message = cipher.iv + cipher.encrypt(phrase)
-    # print(encrypted_phrase)
-
-
-# main()
-caeser_cipher("hello", 2    )
+main()
