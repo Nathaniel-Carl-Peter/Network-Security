@@ -195,5 +195,5 @@ def caeser_cipher(phrase, offset):
     # print(encrypted_phrase)
 
 
-# main()
-caeser_cipher("hello", 2    )
+main()
+# caeser_cipher("hello", 2    )

@@ -51,6 +51,8 @@ def main():
     print("RSA ENCRYPTION")
     print(f"this is the public key: {publickey}")
     print(f"this is the private key: {privatekey}")
+
+    # this is the RSA encryption
     cipher_message = rsa.encrypt(message, publickey)
     print(f"This is the RSA encrypted message: {cipher_message}")
     # decoded_message = rsa.decrypt(cipher_message, publickey)
@@ -200,14 +202,12 @@ def caeser_cipher(phrase, offset):
 
 
 def DES_encypt(phrase):
-    # key = 'b'
+
+    # make a key of a random byte
     key = get_random_bytes(8)
-
     cipher = DES.new(key, DES.MODE_OFB)
-
-    # bit_phrase = phrase.encode('utf-8')
+    # pad the phrase to the block size
     padded_phrase = pad(phrase, DES.block_size)
-    # encrypted_phrase = cipher.encrypt(padded_phrase)\
     return cipher.iv + cipher.encrypt(padded_phrase)
 
 
