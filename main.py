@@ -1,4 +1,8 @@
 """
+Password Manager
+Author: Lucas O Brian
+Forked: Nathaniel Carl Peter
+
 import modules
 
 
