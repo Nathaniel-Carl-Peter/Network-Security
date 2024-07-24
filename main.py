@@ -35,11 +35,12 @@ REQUIREMENTS = "Password must have a lower case, upper case letter, 1 number and
 MINIMUM_LENGTH_OF_PASSWORD = 8
 MAXIMUM_LENGTH_OF_PASSWORD = 20
 MENU_OPTIONS = "Menu\n(G)enerate new user and password\n(C)heck user and password\n(Q)uit\n"
+FILENAME = "password.json"
 
 
 def main():
     # import user records
-    records = import_details()
+    records = import_details(FILENAME)
     menu_choice = input(MENU_OPTIONS).lower()
 
     while menu_choice != 'q':
@@ -139,10 +140,14 @@ def validate_password(records):
                 print("Failure!")
 
 
-def import_details():
+def import_details(filename):
     """Load in records from a json file."""
-    with open("password.json", "r", encoding="UTF-8") as in_file:
-        records = json.load(in_file)
+    try:
+        with open(filename, "r", encoding="UTF-8") as in_file:
+            records = json.load(in_file)
+    except FileNotFoundError:
+        print(f"File {filename} not found")
+        records = list()
     return records
 
 
@@ -156,7 +161,6 @@ def fix_password(username, password, salt):
 
 
 def caeser_cipher(phrase, offset):
-
     # for i in range(len(phrase)):
     #     letter = phrase[i]
     #
@@ -182,10 +186,6 @@ def caeser_cipher(phrase, offset):
             ans += chr((ord(ch) + offset - 97) % 26 + 97)
 
     return ans
-
-
-
-
 
     # # key = 'b'
     # key = get_random_bytes(8)
